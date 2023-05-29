@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas Animation</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            background-color: darkcyan;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="animationCanvas"></canvas>
+
+    <script>
+        // Array com os nomes dos quadros de imagem PNG
+        var frameNames0 = ["cd1.png", "cd2.png", "cd3.png", "cd4.png"];
+        var frameNames = ["cv1.png", "cv2.png", "cv3.png", "cv4.png", "cv5.png", "cv6.png"];
+        var frameNames1 = ["ci1.png", "ci2.png", "ci3.png", "ci4.png", "ci5.png", "ci6.png", "ci7.png", "ci8.png", "ci9.png", "ci10.png"];
+        var frameNames2 = ["ca1.png", "ca2.png", "ca3.png", "ca4.png", "ca5.png", "ca6.png", "ca7.png"];
+        var frameIndex = 0; // Índice inicial do quadro
+        var isRightArrowPressed = false; // Verifica se a seta para frente está pressionada
+        var isRightArrowReleased = false; // Verifica se a seta para frente foi solta
+        var isIntroAnimationFinished = false; // Verifica se a animação de introdução foi concluída
+        var isImagesLoaded = false; // Verifica se todas as imagens foram carregadas
+
+        // Obtém o elemento do canvas
+        var canvas = document.getElementById("animationCanvas");
+        var context = canvas.getContext("2d");
+
+        // Carrega todas as imagens dos quadros
+        var frames0 = [];
+        var frameLoadCount0 = 0;
+        for (var i = 0; i < frameNames0.length; i++) {
+            var frame0 = new Image();
+            frame0.src = frameNames0[i];
+            frame0.onload = function () {
+                frameLoadCount0++;
+                if (frameLoadCount0 === frameNames0.length) {
+                    // Todos os quadros foram carregados
+                    isImagesLoaded = true;
+                }
+            };
+            frames0.push(frame0);
+        }
+
+        // Carrega todas as imagens dos quadros da animação "cv"
+        var frames = [];
+        var frameLoadCount = 0;
+        for (var i = 0; i < frameNames.length; i++) {
+            var frame = new Image();
+            frame.src = frameNames[i];
+            frame.onload = function () {
+                frameLoadCount++;
+                if (frameLoadCount === frameNames.length) {
+                    // Todos os quadros da animação "cv" foram carregados
+                }
+            };
+            frames.push(frame);
+        }
+
+        // Carrega todas as imagens dos quadros da animação "ci"
+        var frames1 = [];
+        var frameLoadCount1 = 0;
+        for (var i = 0; i < frameNames1.length; i++) {
+            var frame1 = new Image();
+            frame1.src = frameNames1[i];
+            frame1.onload = function () {
+                frameLoadCount1++;
+                if (frameLoadCount1 === frameNames1.length) {
+                    // Todos os quadros da animação "ci" foram carregados
+                    isIntroAnimationFinished = true; // Indica que a animação de introdução foi concluída
+                }
+            };
+            frames1.push(frame1);
+        }
+
+        // Carrega todas as imagens dos quadros da animação "ca"
+        var frames2 = [];
+        var frameLoadCount2 = 0;
+        for (var i = 0; i < frameNames2.length; i++) {
+            var frame2 = new Image();
+            frame2.src = frameNames2[i];
+            frame2.onload = function () {
+                frameLoadCount2++;
+                if (frameLoadCount2 === frameNames2.length) {
+                    // Todos os quadros da animação "ca" foram carregados
+                }
+            };
+            frames2.push(frame2);
+        }
+
+        // Evento de pressionar uma tecla
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "ArrowRight") {
+                isRightArrowPressed = true;
+            }
+        });
+
+        // Evento de liberar uma tecla
+        document.addEventListener("keyup", function(event) {
+            if (event.key === "ArrowRight") {
+                isRightArrowPressed = false;
+                isRightArrowReleased = true; // A seta foi solta
+                frameIndex = 0; // Reinicia o índice do quadro para reiniciar a animação "cv"
+                isIntroAnimationFinished = false; // Reseta a variável de controle da animação de introdução
+            }
+        });
+
+        // Função para atualizar a animação
+        function updateAnimation() {
+            // Limpa o canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Verifica se a seta para frente está pressionada
+            if (isRightArrowPressed && isImagesLoaded) {
+                // Verifica se a animação de introdução ainda não terminou
+                if (!isIntroAnimationFinished) {
+                    // Desenha o quadro atual da animação "ci"
+                    context.drawImage(frames1[frameIndex], 0, 0);
+                    
+                    // Atualiza o índice do quadro
+                    frameIndex++;
+                    if (frameIndex >= frames1.length) {
+                        // A animação de introdução do "ci" terminou, então começamos a animação do "ca"
+                        frameIndex = frames1.length;
+                        isIntroAnimationFinished = true;
+                    }
+                } else {
+                    // Desenha o quadro atual da animação "ca"
+                    var caFrameIndex = (frameIndex - frames1.length) % frames2.length;
+                    context.drawImage(frames2[caFrameIndex], 0, 0);
+                    
+                    // Atualiza o índice do quadro
+                    frameIndex++;
+                }
+            } else {
+                // Verifica se a seta foi solta
+                if (isRightArrowReleased && isImagesLoaded) {
+                    // Desenha o quadro atual da animação "cd"
+                    context.drawImage(frames0[frameIndex], 0, 0);
+
+                    // Atualiza o índice do quadro
+                    frameIndex++;
+                    if (frameIndex >= frames0.length) {
+                        frameIndex = 0; // Reinicia a animação "cd"
+                        isRightArrowReleased = false; // Reseta a variável de controle
+                    }
+                } else {
+                    // Desenha o quadro atual da animação "cv"
+                    context.drawImage(frames[frameIndex], 0, 0);
+
+                    // Atualiza o índice do quadro
+                    frameIndex++;
+                    if (frameIndex >= frames.length) {
+                        frameIndex = 0; // Reinicia a animação "cv"
+                    }
+                }
+            }
+        }
+
+        // Verifica se todas as imagens foram carregadas antes de iniciar a animação
+        var checkImagesLoadedInterval = setInterval(function() {
+            if (isImagesLoaded) {
+                clearInterval(checkImagesLoadedInterval);
+                setInterval(updateAnimation, 100); // Altere o intervalo para ajustar a velocidade da animação
+            }
+        }, 100);
+
+    </script>
+</body>
+</html>
